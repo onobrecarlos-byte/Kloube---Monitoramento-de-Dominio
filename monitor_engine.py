@@ -10,10 +10,12 @@ import time
 import urllib.error
 import urllib.parse
 import urllib.request
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from pathlib import Path
+
+BRT_TZ = timezone(timedelta(hours=-3))
 
 BASE_DIR = Path(__file__).resolve().parent
 DATA_FILE = BASE_DIR / "data.json"
@@ -63,7 +65,7 @@ PARKED_OR_UNCONFIGURED_PATTERNS = [
 
 
 def now_iso() -> str:
-    return datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    return datetime.now(BRT_TZ).strftime("%Y-%m-%d %H:%M:%S")
 
 
 def normalize_domain_input(raw: str) -> tuple[str, str]:

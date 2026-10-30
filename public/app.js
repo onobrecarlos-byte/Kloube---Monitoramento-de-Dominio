@@ -258,10 +258,60 @@ function applyState(data) {
     renderAll();
 }
 
-let sessionAccessTime = (() => {
-    const now = new Date();
-    return `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-})();
+function getBrasiliaTimeHHMM() {
+    try {
+        return new Intl.DateTimeFormat('pt-BR', {
+            timeZone: 'America/Sao_Paulo',
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: false,
+        }).format(new Date());
+    } catch (_) {
+        const now = new Date();
+        return `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+    }
+}
+
+let sessionAccessTime = getBrasiliaTimeHHMM();
+let isAutoChecking = false;
+
+async function runCheckAll(silent = false) {
+    if (isAutoChecking) return;
+    isAutoChecking = true;
+
+    const btn = document.getElementById('btn-check-all');
+    const icon = document.getElementById('check-all-icon');
+    const label = document.getElementById('check-all-label');
+
+    if (btn) btn.disabled = true;
+    if (icon) icon.classList.add('spin');
+    if (label) label.textContent = 'Verificando...';
+
+    try {
+        const res = await fetch('/api/check-all', { method: 'POST' });
+        const data = await res.json();
+        if (data.ok) {
+            applyState(data);
+            sessionAccessTime = getBrasiliaTimeHHMM();
+            const syncEl = document.getElementById('last-sync-text');
+            if (syncEl) {
+                syncEl.textContent = `Última verificação às ${sessionAccessTime}`;
+            }
+            if (!silent) {
+                showToast('Verificação concluída', 'Todos os domínios foram atualizados.', 'success');
+            }
+        }
+    } catch (_) {
+        if (!silent) {
+            showToast('Erro', 'Falha ao verificar os domínios.', 'error');
+        }
+    } finally {
+        isAutoChecking = false;
+        if (btn) btn.disabled = false;
+        if (icon) icon.classList.remove('spin');
+        if (label) label.textContent = 'Verificar agora';
+    }
+}
 
 async function fetchState() {
     try {
@@ -273,6 +323,9 @@ async function fetchState() {
             const syncEl = document.getElementById('last-sync-text');
             if (syncEl) {
                 syncEl.textContent = `Último acesso às ${sessionAccessTime}`;
+            }
+            if (data.needs_refresh && !isAutoChecking) {
+                runCheckAll(true);
             }
         }
     } catch (err) {
@@ -744,6 +797,11 @@ window.checkSingleDomain = async function(domainId, btnEl) {
         const data = await res.json();
         if (data.ok) {
             applyState(data.state);
+            sessionAccessTime = getBrasiliaTimeHHMM();
+            const syncEl = document.getElementById('last-sync-text');
+            if (syncEl) {
+                syncEl.textContent = `Última verificação às ${sessionAccessTime}`;
+            }
             if (data.domain && data.domain.status === 'online') {
                 showToast('Verificação concluída', `${data.domain.name || data.domain.domain} está online.`, 'success');
             }
@@ -759,30 +817,7 @@ window.checkSingleDomain = async function(domainId, btnEl) {
     }
 };
 
-document.getElementById('btn-check-all').addEventListener('click', async () => {
-    const btn = document.getElementById('btn-check-all');
-    const icon = document.getElementById('check-all-icon');
-    const label = document.getElementById('check-all-label');
-
-    btn.disabled = true;
-    if (icon) icon.classList.add('spin');
-    if (label) label.textContent = 'Verificando...';
-
-    try {
-        const res = await fetch('/api/check-all', { method: 'POST' });
-        const data = await res.json();
-        if (data.ok) {
-            applyState(data);
-            showToast('Verificação concluída', 'Todos os domínios foram atualizados.', 'success');
-        }
-    } catch (_) {
-        showToast('Erro', 'Falha ao verificar os domínios.', 'error');
-    } finally {
-        btn.disabled = false;
-        if (icon) icon.classList.remove('spin');
-        if (label) label.textContent = 'Verificar agora';
-    }
-});
+document.getElementById('btn-check-all').addEventListener('click', () => runCheckAll(false));
 
 // ==========================================
 // Configurações & Teste de Notificação
@@ -1075,8 +1110,7 @@ document.getElementById('login-form').addEventListener('submit', async (e) => {
             return;
         }
         localStorage.setItem(AUTH_STORAGE_KEY, data.user.email);
-        const now = new Date();
-        sessionAccessTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+        sessionAccessTime = getBrasiliaTimeHHMM();
         const syncEl = document.getElementById('last-sync-text');
         if (syncEl) syncEl.textContent = `Último acesso às ${sessionAccessTime}`;
         updateAdminVisibility();
@@ -1145,8 +1179,7 @@ document.getElementById('reset-password-form').addEventListener('submit', async 
             return;
         }
         localStorage.setItem(AUTH_STORAGE_KEY, data.user.email);
-        const now = new Date();
-        sessionAccessTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+        sessionAccessTime = getBrasiliaTimeHHMM();
         const syncEl = document.getElementById('last-sync-text');
         if (syncEl) syncEl.textContent = `Último acesso às ${sessionAccessTime}`;
         updateAdminVisibility();

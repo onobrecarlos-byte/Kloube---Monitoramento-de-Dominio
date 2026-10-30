@@ -7,10 +7,12 @@ import threading
 import time
 import urllib.parse
 import uuid
+from datetime import datetime
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
 from monitor_engine import (
+    BRT_TZ,
     DEFAULT_EMAIL,
     DomainStore,
     check_single_domain,
@@ -107,9 +109,41 @@ def verify_all_domains(force_notify: bool = False, include_drafts: bool = False)
     return data.get("domains", [])
 
 
+def _get_latest_checked_ts(domains: list[dict]) -> float:
+    latest_ts = 0.0
+    for d in domains:
+        raw_dt = d.get("checked_at", "")
+        if raw_dt:
+            try:
+                dt = datetime.strptime(raw_dt, "%Y-%m-%d %H:%M:%S").replace(
+                    tzinfo=BRT_TZ
+                )
+                latest_ts = max(latest_ts, dt.timestamp())
+            except Exception:
+                pass
+    return latest_ts
+
+
+def _should_refresh_domains(data: dict) -> bool:
+    domains = [
+        d for d in data.get("domains", []) if d.get("status") != "draft"
+    ]
+    if not domains:
+        return False
+    if os.environ.get("VERCEL") and not store.tmp_path.exists():
+        return True
+    interval = int(
+        data.get("settings", {}).get("check_interval_seconds", 3600)
+    )
+    interval = max(60, interval)
+    latest_ts = _get_latest_checked_ts(domains)
+    if latest_ts <= 0:
+        return True
+    return (time.time() - latest_ts) >= interval
+
+
 def background_monitor_loop():
-    """Continuously monitors all registered domains strictly at the configured 1h interval."""
-    from datetime import datetime
+    """Continuously monitors all registered domains strictly at the configured interval."""
     time.sleep(5)
     while True:
         try:
@@ -117,18 +151,10 @@ def background_monitor_loop():
             interval = int(
                 data.get("settings", {}).get("check_interval_seconds", 3600)
             )
-            interval = max(3600, interval)
+            interval = max(60, interval)
             domains = data.get("domains", [])
             if domains:
-                latest_ts = 0.0
-                for d in domains:
-                    raw_dt = d.get("checked_at", "")
-                    if raw_dt:
-                        try:
-                            dt = datetime.strptime(raw_dt, "%Y-%m-%d %H:%M:%S")
-                            latest_ts = max(latest_ts, dt.timestamp())
-                        except Exception:
-                            pass
+                latest_ts = _get_latest_checked_ts(domains)
                 elapsed = time.time() - latest_ts if latest_ts > 0 else interval
                 if elapsed >= interval:
                     verify_all_domains(force_notify=False)
@@ -171,7 +197,15 @@ class KloubeHandler(BaseHTTPRequestHandler):
             data = store.load()
             accounts = list(data.get("users", {}).keys())
             safe_data = {k: v for k, v in data.items() if k != "users"}
-            return self._send_json({"ok": True, "accounts": accounts, **safe_data})
+            return self._send_json(
+                {
+                    "ok": True,
+                    "accounts": accounts,
+                    "server_time": now_iso(),
+                    "needs_refresh": _should_refresh_domains(data),
+                    **safe_data,
+                }
+            )
 
         if path == "/api/cron":
             verify_all_domains(force_notify=False, include_drafts=False)
