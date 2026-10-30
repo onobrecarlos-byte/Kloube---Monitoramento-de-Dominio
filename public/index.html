@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kloube — Monitoramento de domínios</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="shortcut icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none'%3E%3Crect width='28' height='28' rx='6' fill='%23FFFFFF'/%3E%3Cpath d='M6.5 7.8H11.6V12.9L21.8 6.2L6.5 21.2V7.8Z' fill='%23061647'/%3E%3Cpath d='M15.7 13.9L12.1 17.4L15.7 21.2H21.4L15.7 13.9Z' fill='%23061647'/%3E%3C/svg%3E" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+    <!-- Tela de Login e Redefinição de Senha -->
+    <div id="auth-screen" class="auth-screen">
+        <div class="auth-glow-circle" aria-hidden="true"></div>
+        <div class="auth-card">
+            <div class="auth-brand">
+                <span class="brand-mark" aria-hidden="true">
+                    <svg width="32" height="32" viewBox="0 0 28 28" fill="none">
+                        <rect width="28" height="28" rx="6" fill="#FFFFFF"/>
+                        <path d="M6.5 7.8H11.6V12.9L21.8 6.2L6.5 21.2V7.8Z" fill="#061647"/>
+                        <path d="M15.7 13.9L12.1 17.4L15.7 21.2H21.4L15.7 13.9Z" fill="#061647"/>
+                    </svg>
+                </span>
+                <span class="brand-wordmark">Kloube</span>
+            </div>
+
+            <!-- Visão 1: Login -->
+            <div id="auth-login-view">
+                <h2 class="auth-title">Acessar painel</h2>
+                <p class="auth-subtitle">Entre com seu e-mail e senha para gerenciar os domínios.</p>
+
+                <form id="login-form" novalidate>
+                    <div id="login-error-box" class="form-error-box" style="display:none;" role="alert"></div>
+
+                    <div class="form-field">
+                        <label for="login-email">E-mail</label>
+                        <input type="email" id="login-email" placeholder="" required autocomplete="username" />
+                    </div>
+
+                    <div class="form-field">
+                        <div class="auth-label-row">
+                            <label for="login-password">Senha</label>
+                            <button type="button" id="btn-forgot-password" class="link-btn auth-forgot-link">Esqueceu ou quer trocar a senha?</button>
+                        </div>
+                        <input type="password" id="login-password" placeholder="" required autocomplete="current-password" />
+                    </div>
+
+                    <button type="submit" id="btn-login-submit" class="btn btn-primary auth-submit-btn">
+                        <span>Entrar no painel</span>
+                    </button>
+                </form>
+            </div>
+
+            <!-- Visão 2: Trocar / Redefinir Senha -->
+            <div id="auth-reset-view" style="display:none;">
+                <h2 class="auth-title">Trocar senha</h2>
+                <p class="auth-subtitle" id="auth-reset-subtitle">Receba um código no seu e-mail cadastrado para definir uma nova senha.</p>
+
+                <form id="reset-password-form" novalidate>
+                    <div id="reset-error-box" class="form-error-box" style="display:none;" role="alert"></div>
+
+                    <div class="form-field">
+                        <label for="reset-email">E-mail da conta</label>
+                        <div class="auth-inline-row">
+                            <input type="email" id="reset-email" placeholder="" required autocomplete="username" />
+                            <button type="button" id="btn-send-reset-code" class="btn btn-secondary btn-sm">Enviar código</button>
+                        </div>
+                    </div>
+
+                    <div class="form-field" id="reset-code-group">
+                        <label for="reset-code">Código de 6 dígitos (enviado no e-mail)</label>
+                        <input type="text" id="reset-code" placeholder="Ex: 123456" maxlength="6" autocomplete="one-time-code" />
+                    </div>
+
+                    <div class="form-field">
+                        <label for="reset-new-password">Nova senha</label>
+                        <input type="password" id="reset-new-password" placeholder="" required autocomplete="new-password" />
+                    </div>
+
+                    <div class="form-field">
+                        <label for="reset-confirm-password">Confirmar nova senha</label>
+                        <input type="password" id="reset-confirm-password" placeholder="" required autocomplete="new-password" />
+                    </div>
+
+                    <div class="auth-reset-actions">
+                        <button type="button" id="btn-back-to-login" class="btn btn-secondary">Voltar</button>
+                        <button type="submit" id="btn-reset-submit" class="btn btn-primary" style="flex:1;">
+                            <span>Salvar nova senha</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- 1. Cabeçalho -->
+    <header class="topbar">
+        <div class="container topbar-inner">
+            <div class="topbar-left">
+                <a href="/" class="brand" aria-label="Kloube">
+                    <span class="brand-mark" aria-hidden="true">
+                        <svg width="26" height="26" viewBox="0 0 28 28" fill="none">
+                            <rect width="28" height="28" rx="6" fill="#FFFFFF"/>
+                            <path d="M6.5 7.8H11.6V12.9L21.8 6.2L6.5 21.2V7.8Z" fill="#061647"/>
+                            <path d="M15.7 13.9L12.1 17.4L15.7 21.2H21.4L15.7 13.9Z" fill="#061647"/>
+                        </svg>
+                    </span>
+                    <span class="brand-wordmark">Kloube</span>
+                </a>
+
+                <span class="topbar-divider" aria-hidden="true"></span>
+
+                <div class="monitor-status-indicator" id="header-monitor-status">
+                    <span class="status-dot status-dot-green" aria-hidden="true"></span>
+                    <span>Monitoramento ativo</span>
+                </div>
+            </div>
+
+            <div class="topbar-right">
+                <button type="button" id="btn-open-create-account" class="topbar-btn" style="display:none;" title="Criar nova conta de acesso (Exclusivo Admin)">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                        <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="8.5" cy="7" r="4"></circle>
+                        <line x1="20" y1="8" x2="20" y2="14"></line>
+                        <line x1="23" y1="11" x2="17" y2="11"></line>
+                    </svg>
+                    <span>Criar conta</span>
+                </button>
+
+                <button type="button" id="btn-open-settings" class="topbar-btn">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                        <circle cx="12" cy="12" r="3"></circle>
+                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                    </svg>
+                    <span>Configurações</span>
+                </button>
+
+                <button type="button" id="btn-header-change-pass" class="topbar-btn" title="Trocar senha de acesso">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                    </svg>
+                    <span>Trocar senha</span>
+                </button>
+
+                <button type="button" id="btn-logout" class="topbar-btn" title="Sair da conta">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                        <polyline points="16 17 21 12 16 7"></polyline>
+                        <line x1="21" y1="12" x2="9" y2="12"></line>
+                    </svg>
+                    <span>Sair</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="container main-layout">
+        <!-- Banner de erro de conexão caso o servidor falhe -->
+        <div id="connection-error-banner" class="error-banner" style="display:none;" role="alert">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="12"></line>
+                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+            <span>Não foi possível sincronizar os dados com o servidor local. Tentando reconectar...</span>
+            <button type="button" class="btn btn-secondary btn-sm" id="btn-retry-sync">Tentar novamente</button>
+        </div>
+
+        <!-- 2. Identificação da tela -->
+        <section class="page-header">
+            <div class="page-header-text">
+                <h1 class="page-title">Monitoramento de domínios</h1>
+                <p class="page-subtitle">Acompanhe a disponibilidade e o destino das suas lojas.</p>
+            </div>
+
+            <div class="page-header-actions">
+                <button type="button" id="btn-check-all" class="btn btn-secondary">
+                    <svg id="check-all-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                        <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+                        <path d="M3 3v5h5"></path>
+                        <path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"></path>
+                        <path d="M16 16h5v5"></path>
+                    </svg>
+                    <span id="check-all-label">Verificar agora</span>
+                </button>
+
+                <button type="button" id="btn-open-add" class="btn btn-primary">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
+                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                    </svg>
+                    <span>Adicionar domínio</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- 3. Resumo (4 Cards compactos) -->
+        <section class="summary-grid" aria-label="Resumo do monitoramento">
+            <div class="summary-card">
+                <div class="summary-icon summary-icon-blue" aria-hidden="true">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="2" y1="12" x2="22" y2="12"></line>
+                        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                    </svg>
+                </div>
+                <div class="summary-content">
+                    <span class="summary-label">Domínios monitorados</span>
+                    <strong class="summary-value" id="stat-total">0</strong>
+                </div>
+            </div>
+
+            <div class="summary-card">
+                <div class="summary-icon summary-icon-green" aria-hidden="true">
+                    <span class="summary-dot-green"></span>
+                </div>
+                <div class="summary-content">
+                    <span class="summary-label">Online</span>
+                    <strong class="summary-value" id="stat-online">0</strong>
+                </div>
+            </div>
+
+            <div class="summary-card">
+                <div class="summary-icon summary-icon-red" aria-hidden="true">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                        <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path>
+                        <line x1="12" y1="9" x2="12" y2="13"></line>
+                        <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                    </svg>
+                </div>
+                <div class="summary-content">
+                    <span class="summary-label">Com problemas</span>
+                    <strong class="summary-value" id="stat-offline">0</strong>
+                </div>
+            </div>
+
+            <div class="summary-card">
+                <div class="summary-icon summary-icon-neutral" aria-hidden="true">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="12 6 12 12 16 14"></polyline>
+                    </svg>
+                </div>
+                <div class="summary-content">
+                    <span class="summary-label">Intervalo de verificação</span>
+                    <strong class="summary-value" id="stat-interval">1 h</strong>
+                </div>
+            </div>
+        </section>
+
+        <!-- 5. Lista de domínios (Área principal) -->
+        <section class="panel domains-panel" aria-labelledby="domains-section-title">
+            <div class="panel-header">
+                <div class="panel-title-group">
+                    <h2 class="panel-title" id="domains-section-title">Domínios monitorados</h2>
+                    <p class="panel-meta" id="last-sync-text">Sincronizando...</p>
+                </div>
+
+                <div class="panel-controls">
+                    <div class="segmented-control" role="tablist" aria-label="Filtrar domínios por status">
+                        <button type="button" class="segment-btn active" data-filter="all" role="tab" aria-selected="true">
+                            Todos
+                        </button>
+                        <button type="button" class="segment-btn" data-filter="online" role="tab" aria-selected="false">
+                            <span class="dot-indicator dot-green" aria-hidden="true"></span>
+                            Online
+                        </button>
+                        <button type="button" class="segment-btn" data-filter="offline" role="tab" aria-selected="false">
+                            <span class="dot-indicator dot-red" aria-hidden="true"></span>
+                            Com problemas
+                        </button>
+                    </div>
+
+                    <div class="search-field">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                        </svg>
+                        <input type="search" id="search-input" placeholder="Buscar domínio..." aria-label="Buscar por nome da loja, domínio ou diagnóstico" />
+                    </div>
+                </div>
+            </div>
+
+            <div class="table-container" id="domains-table-container">
+                <table class="domains-table">
+                    <thead>
+                        <tr>
+                            <th class="col-domain">LOJA / DOMÍNIO</th>
+                            <th class="col-diag">DIAGNÓSTICO</th>
+                            <th class="col-time">ÚLTIMA VERIFICAÇÃO</th>
+                            <th class="col-status">STATUS</th>
+                            <th class="col-actions">AÇÕES</th>
+                        </tr>
+                    </thead>
+                    <tbody id="domains-tbody">
+                        <!-- Preenchido via JS -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Estado de carregamento inicial -->
+            <div id="loading-state" class="state-box">
+                <div class="spinner" aria-hidden="true"></div>
+                <p>Carregando domínios monitorados...</p>
+            </div>
+
+            <!-- Estado de lista vazia -->
+            <div id="empty-state" class="state-box" style="display:none;">
+                <div class="state-icon" aria-hidden="true">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="2" y1="12" x2="22" y2="12"></line>
+                        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                    </svg>
+                </div>
+                <h3 class="state-title">Nenhum domínio monitorado</h3>
+                <p class="state-desc">Adicione o domínio da sua primeira loja para acompanhar a disponibilidade e o direcionamento automaticamente.</p>
+                <button type="button" class="btn btn-primary" id="btn-empty-add">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                    </svg>
+                    <span>Adicionar domínio</span>
+                </button>
+            </div>
+
+            <!-- Estado de busca/filtro sem resultados -->
+            <div id="no-results-state" class="state-box" style="display:none;">
+                <h3 class="state-title">Nenhum resultado encontrado</h3>
+                <p class="state-desc">Não encontramos domínios correspondentes aos filtros ou termo buscado.</p>
+                <button type="button" class="btn btn-secondary btn-sm" id="btn-clear-filters">Limpar filtros</button>
+            </div>
+        </section>
+
+        <!-- 6. Histórico de alertas -->
+        <section class="panel alerts-panel" aria-labelledby="alerts-section-title">
+            <div class="panel-header alerts-header">
+                <div class="panel-title-group">
+                    <h2 class="panel-title" id="alerts-section-title">Histórico de alertas</h2>
+                    <p class="panel-meta">Registro permanente de lojas que apresentaram bloqueio ou queda.</p>
+                </div>
+            </div>
+
+            <div id="alerts-list" class="alerts-list">
+                <!-- Preenchido via JS -->
+            </div>
+        </section>
+
+        <!-- Rodapé discreto de status -->
+        <footer class="status-footer">
+            <div class="footer-left">
+                <span class="status-dot status-dot-green" aria-hidden="true"></span>
+                <span>Verificação automática ativa</span>
+                <span class="footer-sep" aria-hidden="true">|</span>
+                <span id="footer-next-check" class="footer-muted">Intervalo configurado: 1 h</span>
+            </div>
+            <div class="footer-right">
+                <button type="button" id="btn-test-alert" class="link-btn">
+                    Disparar alerta de teste
+                </button>
+            </div>
+        </footer>
+    </main>
+
+    <!-- 4. Modal de Cadastro: Adicionar Domínio -->
+    <div id="add-modal" class="modal-backdrop" style="display:none;" role="dialog" aria-modal="true" aria-labelledby="add-modal-title">
+        <div class="modal-dialog">
+            <div class="modal-header">
+                <div>
+                    <h3 id="add-modal-title" class="modal-title">Adicionar domínio</h3>
+                    <p class="modal-subtitle">Cadastre um novo domínio para monitorar sua disponibilidade e direcionamento.</p>
+                </div>
+                <button type="button" class="icon-close" id="btn-close-add" aria-label="Fechar modal">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+
+            <form id="add-domain-form" novalidate>
+                <div id="add-form-error" class="form-error-box" style="display:none;" role="alert"></div>
+
+                <div class="form-field">
+                    <label for="input-domain">Domínio</label>
+                    <input type="text" id="input-domain" placeholder="Ex: www.sualoja.com.br" required autocomplete="off" />
+                    <span class="field-help">Informe apenas o endereço do domínio ou a URL completa da loja.</span>
+                </div>
+
+                <div class="form-field">
+                    <label for="input-name">Nome da loja <span class="label-optional">— opcional</span></label>
+                    <input type="text" id="input-name" placeholder="Ex: Longwell Kitchen" autocomplete="off" />
+                    <span class="field-help">Nome amigável exibido em destaque na tabela e nos alertas.</span>
+                </div>
+
+                <div class="form-field">
+                    <label for="input-redirect">Destino esperado <span class="label-optional">— opcional</span></label>
+                    <input type="text" id="input-redirect" placeholder="Ex: sualoja.myshopify.com ou trecho da URL final" autocomplete="off" />
+                    <span class="field-help">Se preenchido, valida se o domínio redireciona ou responde com esse destino.</span>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" id="btn-cancel-add">Cancelar</button>
+                    <button type="submit" id="btn-submit-add" class="btn btn-primary">
+                        <span>Adicionar domínio</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal de Edição: Editar Domínio -->
+    <div id="edit-modal" class="modal-backdrop" style="display:none;" role="dialog" aria-modal="true" aria-labelledby="edit-modal-title">
+        <div class="modal-dialog">
+            <div class="modal-header">
+                <div>
+                    <h3 id="edit-modal-title" class="modal-title">Editar domínio</h3>
+                    <p class="modal-subtitle">Altere os dados abaixo. O domínio será verificado novamente ao salvar.</p>
+                </div>
+                <button type="button" class="icon-close" id="btn-close-edit" aria-label="Fechar modal">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+
+            <form id="edit-domain-form" novalidate>
+                <input type="hidden" id="edit-id" />
+                <div id="edit-form-error" class="form-error-box" style="display:none;" role="alert"></div>
+
+                <div class="form-field">
+                    <label for="edit-domain">Domínio</label>
+                    <input type="text" id="edit-domain" placeholder="Ex: www.sualoja.com.br" required autocomplete="off" />
+                    <span class="field-help">Endereço do domínio que será consultado nas verificações.</span>
+                </div>
+
+                <div class="form-field">
+                    <label for="edit-name">Nome da loja <span class="label-optional">— opcional</span></label>
+                    <input type="text" id="edit-name" placeholder="Ex: Longwell Kitchen" autocomplete="off" />
+                    <span class="field-help">Identificação da loja na listagem principal.</span>
+                </div>
+
+                <div class="form-field">
+                    <label for="edit-redirect">Destino esperado <span class="label-optional">— opcional</span></label>
+                    <input type="text" id="edit-redirect" placeholder="Ex: sualoja.com.br" autocomplete="off" />
+                    <span class="field-help">Deixe em branco para validar qualquer site ativo não estacionado.</span>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" id="btn-cancel-edit">Cancelar</button>
+                    <button type="submit" id="btn-submit-edit" class="btn btn-primary">Salvar alterações</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal de Confirmação (Exclusão de domínio / Limpar histórico) -->
+    <div id="confirm-modal" class="modal-backdrop" style="display:none;" role="dialog" aria-modal="true" aria-labelledby="confirm-modal-title">
+        <div class="modal-dialog modal-dialog-sm">
+            <div class="modal-header">
+                <h3 id="confirm-modal-title" class="modal-title">Confirmar ação</h3>
+                <button type="button" class="icon-close" id="btn-close-confirm" aria-label="Fechar modal">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+            <p id="confirm-modal-desc" class="modal-body-text"></p>
+            <div class="modal-actions">
+                <button type="button" class="btn btn-secondary" id="btn-cancel-confirm">Cancelar</button>
+                <button type="button" class="btn btn-danger" id="btn-accept-confirm">Confirmar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Configurações -->
+    <div id="settings-modal" class="modal-backdrop" style="display:none;" role="dialog" aria-modal="true" aria-labelledby="settings-modal-title">
+        <div class="modal-dialog modal-dialog-lg">
+            <div class="modal-header">
+                <div>
+                    <h3 id="settings-modal-title" class="modal-title">Configurações de monitoramento</h3>
+                    <p class="modal-subtitle">Gerencie o intervalo de verificação e os canais de notificação.</p>
+                </div>
+                <button type="button" class="icon-close" id="btn-close-settings" aria-label="Fechar modal">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+
+            <form id="settings-form">
+                <div class="form-row-2">
+                    <div class="form-field">
+                        <label for="set-email">E-mails para alertas</label>
+                        <input type="text" id="set-email" value="onobrecarlos@gmail.com, alertas.kloube@gmail.com" required />
+                        <span class="field-help">Separe múltiplos e-mails por vírgula para que todos recebam os alertas.</span>
+                    </div>
+
+                    <div class="form-field">
+                        <label for="set-interval">Intervalo de verificação</label>
+                        <select id="set-interval">
+                            <option value="60">1 minuto</option>
+                            <option value="180">3 minutos</option>
+                            <option value="300">5 minutos</option>
+                            <option value="600">10 minutos</option>
+                            <option value="1800">30 minutos</option>
+                            <option value="3600" selected>1 hora</option>
+                        </select>
+                        <span class="field-help">Frequência da verificação automática em segundo plano.</span>
+                    </div>
+                </div>
+
+                <div class="form-row-2">
+                    <label class="toggle-box">
+                        <input type="checkbox" id="set-desktop" checked />
+                        <div class="toggle-box-text">
+                            <strong>Notificação no computador</strong>
+                            <span>Exibe alerta nativo no Windows e som ao detectar falhas.</span>
+                        </div>
+                    </label>
+
+                    <label class="toggle-box">
+                        <input type="checkbox" id="set-email-toggle" checked />
+                        <div class="toggle-box-text">
+                            <strong>Notificação por e-mail</strong>
+                            <span>Envia os detalhes do incidente para o e-mail configurado.</span>
+                        </div>
+                    </label>
+                </div>
+
+                <div class="smtp-section">
+                    <div class="smtp-section-head">
+                        <h4>Credenciais SMTP Gmail <span class="label-optional">— opcional</span></h4>
+                        <p>Configure uma Senha de App do Google para envio SMTP direto em segundo plano.</p>
+                    </div>
+                    <div class="form-row-2">
+                        <div class="form-field">
+                            <label for="set-smtp-user">E-mail remetente (Gmail)</label>
+                            <input type="email" id="set-smtp-user" value="growthnobre@gmail.com" placeholder="growthnobre@gmail.com" />
+                        </div>
+                        <div class="form-field">
+                            <label for="set-smtp-pass">Senha de App (16 caracteres)</label>
+                            <input type="password" id="set-smtp-pass" placeholder="•••• •••• •••• ••••" />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-actions modal-actions-spread">
+                    <button type="button" class="btn btn-secondary" id="btn-modal-test-alert">
+                        Testar notificação
+                    </button>
+                    <div class="modal-actions-right">
+                        <button type="button" class="btn btn-secondary" id="btn-cancel-settings">Cancelar</button>
+                        <button type="submit" id="btn-save-settings" class="btn btn-primary">Salvar configurações</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Exclusivo Admin: Criar Conta -->
+    <div id="create-account-modal" class="modal-backdrop" style="display:none;" role="dialog" aria-modal="true" aria-labelledby="create-account-modal-title">
+        <div class="modal-dialog">
+            <div class="modal-header">
+                <div>
+                    <h3 id="create-account-modal-title" class="modal-title">Criar conta de acesso</h3>
+                    <p class="modal-subtitle">Exclusivo para o administrador. Cadastre um novo usuário para acessar o painel Kloube.</p>
+                </div>
+                <button type="button" class="icon-close" id="btn-close-create-account" aria-label="Fechar modal">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+
+            <form id="create-account-form" novalidate>
+                <div id="create-account-error" class="form-error-box" style="display:none;" role="alert"></div>
+
+                <div class="form-field">
+                    <label for="new-account-email">E-mail do novo usuário</label>
+                    <input type="email" id="new-account-email" placeholder="Ex: equipe@kloube.com" required autocomplete="off" />
+                </div>
+
+                <div class="form-field">
+                    <label for="new-account-password">Senha inicial</label>
+                    <input type="password" id="new-account-password" placeholder="Mínimo de 4 caracteres" required autocomplete="new-password" />
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" id="btn-cancel-create-account">Cancelar</button>
+                    <button type="submit" id="btn-submit-create-account" class="btn btn-primary">
+                        <span>Criar conta</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Container de Toasts -->
+    <div id="toast-container" class="toast-container" aria-live="polite"></div>
+
+    <script src="/app.js"></script>
+</body>
+</html>
