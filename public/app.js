@@ -435,7 +435,7 @@ function renderDomainsTable() {
         }
 
         const diag = buildDiagnosisDisplay(d);
-        const checkedFormatted = formatPtDate(d.checked_at);
+        const checkedLabel = isChecking ? 'Verificando...' : 'Verificado';
         const href = d.url || `https://${d.domain}`;
         const storeTitle = d.name && d.name.trim() ? d.name.trim() : d.domain;
 
@@ -464,7 +464,7 @@ function renderDomainsTable() {
                     </div>
                 </td>
                 <td>
-                    <span class="time-text" title="${escapeHtml(d.checked_at || '')}">${escapeHtml(checkedFormatted)}</span>
+                    <span class="time-text">${checkedLabel}</span>
                 </td>
                 <td class="status-cell">
                     <span class="status-badge ${badgeClass}">
