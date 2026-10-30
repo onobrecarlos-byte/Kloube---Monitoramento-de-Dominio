@@ -274,6 +274,7 @@ function getBrasiliaTimeHHMM() {
 
 let sessionAccessTime = getBrasiliaTimeHHMM();
 let isAutoChecking = false;
+const LAST_AUTO_CHECK_KEY = 'kloube_last_auto_check_ts_v1';
 
 async function runCheckAll(silent = false) {
     if (isAutoChecking) return;
@@ -288,7 +289,12 @@ async function runCheckAll(silent = false) {
     if (label) label.textContent = 'Verificando...';
 
     try {
-        const res = await fetch('/api/check-all', { method: 'POST' });
+        localStorage.setItem(LAST_AUTO_CHECK_KEY, String(Date.now()));
+        const res = await fetch('/api/check-all', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ silent: Boolean(silent) }),
+        });
         const data = await res.json();
         if (data.ok) {
             applyState(data);
@@ -324,7 +330,10 @@ async function fetchState() {
             if (syncEl) {
                 syncEl.textContent = `Último acesso às ${sessionAccessTime}`;
             }
-            if (data.needs_refresh && !isAutoChecking) {
+            const intervalMs = Math.max(3600, Number(state.settings.check_interval_seconds || 3600)) * 1000;
+            const lastLocalCheck = Number(localStorage.getItem(LAST_AUTO_CHECK_KEY) || 0);
+            const canAutoCheck = (Date.now() - lastLocalCheck) >= intervalMs;
+            if (data.needs_refresh && canAutoCheck && !isAutoChecking) {
                 runCheckAll(true);
             }
         }
@@ -1261,4 +1270,4 @@ document.getElementById('create-account-form').addEventListener('submit', async 
 // Inicialização
 checkAuthSession();
 fetchState();
-setInterval(fetchState, 10000);
+setInterval(fetchState, 60000);

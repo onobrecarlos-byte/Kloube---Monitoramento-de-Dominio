@@ -658,6 +658,21 @@ class DomainStore:
         reason = check_result.get("reason", "Domínio inacessível ou sem direcionamento")
         checked_at = check_result.get("checked_at", now_iso())
 
+        # Evitar envio repetido em menos de 1 hora para o mesmo domínio
+        if not force:
+            interval = max(3600, int(settings.get("check_interval_seconds", 3600)))
+            now_ts = time.time()
+            for existing_alert in data.get("alerts", []):
+                if existing_alert.get("domain", "").lower() == domain_name.lower():
+                    ts_str = existing_alert.get("timestamp", "")
+                    try:
+                        dt = datetime.strptime(ts_str, "%Y-%m-%d %H:%M:%S").replace(tzinfo=BRT_TZ)
+                        if (now_ts - dt.timestamp()) < interval:
+                            return existing_alert
+                    except Exception:
+                        pass
+                    break
+
         title = f"🚨 KLOUBE ALERTA: {domain_name} Fora do Ar!"
         msg_text = (
             f"Domínio: {domain_name} ({label})\n"
@@ -668,7 +683,10 @@ class DomainStore:
         )
 
         desktop_sent = False
-        if settings.get("desktop_notifications", True) or force:
+        if (
+            os.environ.get("KLOUBE_ENABLE_PC_MONITOR") == "1"
+            and (settings.get("desktop_notifications", False) or force)
+        ):
             desktop_sent = send_windows_desktop_notification(
                 title, f"{domain_name}: {reason}"
             )

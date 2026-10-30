@@ -66,11 +66,12 @@ def main():
         if d.get("status") == "draft":
             print(f"⏸️ RASCUNHO | {d['domain']} ({d.get('name', '')}) -> Monitoramento pausado")
             continue
+        prev_status = d.get("status", "unknown")
         res = check_single_domain(d["domain"], d.get("expected_redirect", ""))
         d.update(res)
         icon = "🟢 ATIVO" if res["status"] == "online" else "🔴 FORA DO AR"
         print(f"{icon} | {d['domain']} ({d.get('name', '')}) -> {res['reason']}")
-        if res["status"] == "offline" and args.notify:
+        if res["status"] == "offline" and args.notify and prev_status != "offline":
             store.trigger_alert(d, res)
     store.save(data)
 

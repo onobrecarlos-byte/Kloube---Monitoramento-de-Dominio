@@ -1,7 +1,7 @@
 {
   "settings": {
     "notify_email": "onobrecarlos@gmail.com, alertas.kloube@gmail.com",
-    "desktop_notifications": true,
+    "desktop_notifications": false,
     "email_notifications": true,
     "check_interval_seconds": 3600,
     "smtp_host": "smtp.gmail.com",
@@ -22,8 +22,8 @@
       "http_code": 200,
       "final_url": "https://libracaseshop.com",
       "ip_address": "23.227.38.65",
-      "response_time_ms": 1636,
-      "checked_at": "2026-10-30 15:17:57",
+      "response_time_ms": 1493,
+      "checked_at": "2026-10-30 16:18:16",
       "created_at": "2026-10-30 11:16:20",
       "page_title": "Libra Cases | Bags Designed to Keep You Organised & Secure"
     },
@@ -39,8 +39,8 @@
       "http_code": 200,
       "final_url": "https://wearkrakatoa.com",
       "ip_address": "23.227.38.65",
-      "response_time_ms": 1597,
-      "checked_at": "2026-10-30 15:17:57",
+      "response_time_ms": 2140,
+      "checked_at": "2026-10-30 16:18:16",
       "created_at": "2026-10-30 11:16:20",
       "page_title": "Krakatoa Underwear &ndash; Krakatoa Underwear"
     },
@@ -56,8 +56,8 @@
       "http_code": 200,
       "final_url": "https://uselongwellco.com",
       "ip_address": "23.227.38.65",
-      "response_time_ms": 1778,
-      "checked_at": "2026-10-30 15:17:57",
+      "response_time_ms": 1369,
+      "checked_at": "2026-10-30 16:18:16",
       "created_at": "2026-10-30 11:16:20",
       "page_title": "Longwell &amp; Co. | Titanium Cookware &amp; Kitchen Essentials &ndash; Longwell &amp; Co"
     },
@@ -73,8 +73,8 @@
       "http_code": 200,
       "final_url": "https://uselushessence.com",
       "ip_address": "23.227.38.65",
-      "response_time_ms": 1634,
-      "checked_at": "2026-10-30 15:17:57",
+      "response_time_ms": 1467,
+      "checked_at": "2026-10-30 16:18:16",
       "created_at": "2026-10-30 11:16:20",
       "page_title": "Lush Essence | Niacinamide Whitening Toothpaste"
     },
@@ -90,8 +90,8 @@
       "http_code": 200,
       "final_url": "https://breezewearco.com",
       "ip_address": "23.227.38.65",
-      "response_time_ms": 1741,
-      "checked_at": "2026-10-30 15:17:57",
+      "response_time_ms": 1286,
+      "checked_at": "2026-10-30 16:18:16",
       "created_at": "2026-10-30 11:16:20",
       "page_title": "Breeze"
     },
@@ -107,8 +107,8 @@
       "http_code": 200,
       "final_url": "https://scarletteshop.com",
       "ip_address": "23.227.38.65",
-      "response_time_ms": 1633,
-      "checked_at": "2026-10-30 15:17:57",
+      "response_time_ms": 1412,
+      "checked_at": "2026-10-30 16:18:16",
       "created_at": "2026-10-30 11:16:20",
       "page_title": "Scarlette™️ Official Store | Silicone Collagen Sheets"
     },
@@ -124,8 +124,8 @@
       "http_code": 200,
       "final_url": "https://bellunamode.com",
       "ip_address": "23.227.38.65",
-      "response_time_ms": 1882,
-      "checked_at": "2026-10-30 15:17:57",
+      "response_time_ms": 1431,
+      "checked_at": "2026-10-30 16:18:16",
       "created_at": "2026-10-30 11:16:20",
       "page_title": "Belluna"
     },
@@ -141,8 +141,8 @@
       "http_code": 200,
       "final_url": "https://myeversock.com",
       "ip_address": "23.227.38.65",
-      "response_time_ms": 1732,
-      "checked_at": "2026-10-30 15:17:57",
+      "response_time_ms": 1094,
+      "checked_at": "2026-10-30 16:18:16",
       "created_at": "2026-10-30 11:16:20",
       "page_title": "EverSock"
     },
@@ -158,8 +158,8 @@
       "http_code": 200,
       "final_url": "https://getsnuggisandals.com",
       "ip_address": "23.227.38.65",
-      "response_time_ms": 883,
-      "checked_at": "2026-10-30 15:17:59",
+      "response_time_ms": 1503,
+      "checked_at": "2026-10-30 16:18:18",
       "created_at": "2026-10-30 11:16:20",
       "page_title": "Snuggi Sandals"
     },
@@ -175,8 +175,8 @@
       "http_code": 200,
       "final_url": "https://usegraceease.com",
       "ip_address": "23.227.38.65",
-      "response_time_ms": 783,
-      "checked_at": "2026-10-30 15:17:59",
+      "response_time_ms": 1064,
+      "checked_at": "2026-10-30 16:18:18",
       "created_at": "2026-10-30 11:16:20",
       "page_title": "Grace & Ease &ndash; Grace &amp; Ease"
     },
@@ -192,8 +192,8 @@
       "http_code": 200,
       "final_url": "https://usevolv-off.com",
       "ip_address": "23.227.38.65",
-      "response_time_ms": 919,
-      "checked_at": "2026-10-30 15:17:59",
+      "response_time_ms": 984,
+      "checked_at": "2026-10-30 16:18:18",
       "created_at": "2026-10-30 11:16:20",
       "page_title": "Evolv - Vitalize Your Life"
     },
@@ -209,8 +209,8 @@
       "http_code": 200,
       "final_url": "https://softaristore.com",
       "ip_address": "23.227.38.65",
-      "response_time_ms": 767,
-      "checked_at": "2026-10-30 15:18:00",
+      "response_time_ms": 1162,
+      "checked_at": "2026-10-30 16:18:18",
       "created_at": "2026-10-30 11:16:20",
       "page_title": "Softari"
     },
@@ -226,8 +226,8 @@
       "http_code": 200,
       "final_url": "https://useluveon.com",
       "ip_address": "23.227.38.71",
-      "response_time_ms": 643,
-      "checked_at": "2026-10-30 15:18:00",
+      "response_time_ms": 852,
+      "checked_at": "2026-10-30 16:18:18",
       "created_at": "2026-10-30 11:16:20",
       "page_title": "Luveon – Bien-être et Sérénité"
     },
@@ -243,8 +243,8 @@
       "http_code": 200,
       "final_url": "https://www.paropetuk.com/",
       "ip_address": "23.227.38.65",
-      "response_time_ms": 1529,
-      "checked_at": "2026-10-30 15:18:00",
+      "response_time_ms": 1605,
+      "checked_at": "2026-10-30 16:18:18",
       "created_at": "2026-10-30 11:16:20",
       "page_title": "ParoPet"
     },
@@ -260,8 +260,8 @@
       "http_code": 200,
       "final_url": "https://donnea-milanoit.com",
       "ip_address": "23.227.38.65",
-      "response_time_ms": 823,
-      "checked_at": "2026-10-30 15:18:00",
+      "response_time_ms": 619,
+      "checked_at": "2026-10-30 16:18:19",
       "created_at": "2026-10-30 11:16:20",
       "page_title": "Donnèa Milano"
     },
@@ -271,16 +271,16 @@
       "url": "https://magiestanks.com",
       "name": "Maggie's Tanks",
       "expected_redirect": "",
-      "status": "online",
-      "status_label": "Ativo",
-      "reason": "Direcionamento ativo (200 OK)",
-      "http_code": 200,
-      "final_url": "https://magiestanks.com",
-      "ip_address": "23.227.38.65",
-      "response_time_ms": 646,
-      "checked_at": "2026-10-30 15:18:00",
+      "status": "offline",
+      "status_label": "Fora do Ar",
+      "reason": "DNS não encontrado ou sem apontamento ativo (NXDOMAIN)",
+      "http_code": null,
+      "final_url": "",
+      "ip_address": "",
+      "response_time_ms": 0,
+      "checked_at": "2026-10-30 16:18:19",
       "created_at": "2026-10-30 11:16:20",
-      "page_title": "Maggie's Tanks™ Official Site | Built-In Bra Tank Tops"
+      "page_title": ""
     },
     {
       "id": "dom_vivacuerpo",
@@ -294,8 +294,8 @@
       "http_code": 200,
       "final_url": "https://vivacuerpomx.com",
       "ip_address": "23.227.38.65",
-      "response_time_ms": 658,
-      "checked_at": "2026-10-30 15:18:00",
+      "response_time_ms": 729,
+      "checked_at": "2026-10-30 16:18:19",
       "created_at": "2026-10-30 11:16:20",
       "page_title": "Viva Cuerpo México &ndash; VivaCuerpo México"
     },
@@ -311,8 +311,8 @@
       "http_code": 200,
       "final_url": "https://www.sondurtravelus.com/",
       "ip_address": "23.227.38.65",
-      "response_time_ms": 1171,
-      "checked_at": "2026-10-30 15:18:00",
+      "response_time_ms": 1201,
+      "checked_at": "2026-10-30 16:18:19",
       "created_at": "2026-10-30 11:16:20",
       "page_title": "Sondur Travel"
     },
@@ -328,8 +328,8 @@
       "http_code": 200,
       "final_url": "https://ionixlabsshop.com",
       "ip_address": "23.227.38.65",
-      "response_time_ms": 854,
-      "checked_at": "2026-10-30 15:18:00",
+      "response_time_ms": 573,
+      "checked_at": "2026-10-30 16:18:19",
       "created_at": "2026-10-30 11:16:20",
       "page_title": "Ionix Labs"
     },
@@ -345,8 +345,8 @@
       "http_code": 200,
       "final_url": "https://orrenaturalsus.com",
       "ip_address": "23.227.38.65",
-      "response_time_ms": 773,
-      "checked_at": "2026-10-30 15:18:01",
+      "response_time_ms": 660,
+      "checked_at": "2026-10-30 16:18:19",
       "created_at": "2026-10-30 11:16:20",
       "page_title": "OrréNaturals"
     },
@@ -362,13 +362,25 @@
       "http_code": 200,
       "final_url": "https://sleepsakeshop.com",
       "ip_address": "23.227.38.65",
-      "response_time_ms": 1052,
-      "checked_at": "2026-10-30 15:18:01",
+      "response_time_ms": 613,
+      "checked_at": "2026-10-30 16:18:19",
       "created_at": "2026-10-30 11:16:20",
       "page_title": "Sleepsake | Butterfly Contour Pillow for Side Sleepers"
     }
   ],
-  "alerts": [],
+  "alerts": [
+    {
+      "id": "al_1793387905431",
+      "domain": "magiestanks.com",
+      "name": "Maggie's Tanks",
+      "reason": "DNS não encontrado ou sem apontamento ativo (NXDOMAIN)",
+      "timestamp": "2026-10-30 16:18:19",
+      "desktop_sent": true,
+      "email_sent": true,
+      "email_recipient": "onobrecarlos@gmail.com, alertas.kloube@gmail.com",
+      "email_info": "E-mail enviado via SMTP para onobrecarlos@gmail.com, alertas.kloube@gmail.com"
+    }
+  ],
   "users": {
     "onobrecarlos@gmail.com": "C@rlos0610",
     "alertas.kloube@gmail.com": "12345678"

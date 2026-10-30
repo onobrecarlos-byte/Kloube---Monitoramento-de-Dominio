@@ -130,12 +130,10 @@ def _should_refresh_domains(data: dict) -> bool:
     ]
     if not domains:
         return False
-    if os.environ.get("VERCEL") and not store.tmp_path.exists():
-        return True
     interval = int(
         data.get("settings", {}).get("check_interval_seconds", 3600)
     )
-    interval = max(60, interval)
+    interval = max(3600, interval)
     latest_ts = _get_latest_checked_ts(domains)
     if latest_ts <= 0:
         return True
@@ -360,7 +358,8 @@ class KloubeHandler(BaseHTTPRequestHandler):
             return self._send_json({"ok": True, **store.load()})
 
         if path == "/api/check-all":
-            verify_all_domains(force_notify=True, include_drafts=False)
+            is_silent = bool(body.get("silent", False))
+            verify_all_domains(force_notify=not is_silent, include_drafts=False)
             return self._send_json({"ok": True, **store.load()})
 
         if path == "/api/settings":
@@ -575,16 +574,17 @@ def _free_port_if_in_use(port: int):
 
 def main():
     _free_port_if_in_use(PORT)
-    monitor_thread = threading.Thread(
-        target=background_monitor_loop, daemon=True
-    )
-    monitor_thread.start()
+    if os.environ.get("KLOUBE_ENABLE_PC_MONITOR") == "1":
+        monitor_thread = threading.Thread(
+            target=background_monitor_loop, daemon=True
+        )
+        monitor_thread.start()
 
     server = ThreadingHTTPServer(("127.0.0.1", PORT), KloubeHandler)
     print(f"====================================================")
-    print(f"  KLOUBE DOMAIN MONITOR ATIVO")
+    print(f"  KLOUBE DOMAIN MONITOR (MODO LOCAL DESATIVADO)")
     print(f"  Painel: http://localhost:{PORT}")
-    print(f"  Notificacoes: Computador + {DEFAULT_EMAIL}")
+    print(f"  Monitoramento automatico pelo PC: DESATIVADO")
     print(f"====================================================")
     try:
         server.serve_forever()
